@@ -8,6 +8,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#1f4a3f">
 <style>
   :root{
     --ink:#14201f;
@@ -777,6 +779,15 @@
     window.addEventListener('focus', maybeRefresh);
     window.addEventListener('pageshow', maybeRefresh);
   })();
+</script>
+<script>
+  // Register the offline service worker so the itinerary works with no service
+  // once it has been opened online once (added for the trip's dead zones).
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+  }
 </script>
 </body>
 </html>

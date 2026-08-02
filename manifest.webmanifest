@@ -1,0 +1,9 @@
+{
+  "name": "Seattle → Banff Roadtrip",
+  "short_name": "SEA→Banff",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f1e6",
+  "theme_color": "#1f4a3f"
+}
