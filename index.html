@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seattle -> Banff Roadtrip</title>
+<meta name="apple-mobile-web-app-title" content="SEA→Banff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+  :root{
+    --ink:#14201f;
+    --pine:#1f4a3f;
+    --spruce:#2e6b57;
+    --dusk:#2b3a54;
+    --sky:#5b7a99;
+    --amber:#c8792e;
+    --rust:#a8432a;
+    --sand:#efe7d6;
+    --paper:#f6f1e6;
+    --paper2:#efe8d8;
+    --line:#cfc3a8;
+    --hike:#2e6b57;
+    --drive:#8a7a56;
+    --stop:#c8792e;
+    --show:#7a3b6b;
+    --mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--sans);
+    color:var(--ink);
+    background:var(--paper);
+    background-image:
+      repeating-linear-gradient(0deg, transparent 0 38px, rgba(31,74,63,.035) 38px 39px),
+      repeating-linear-gradient(90deg, transparent 0 38px, rgba(31,74,63,.035) 38px 39px);
+    line-height:1.5;
+    font-size:17px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:820px;margin:0 auto;padding:0 18px 80px}
+
+  /* ---------- HERO ---------- */
+  header.hero{
+    position:relative;
+    padding:54px 0 30px;
+    text-align:center;
+  }
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:12px;letter-spacing:.32em;text-transform:uppercase;
+    color:var(--spruce);font-weight:600;
+  }
+  .hero h1{
+    font-family:var(--sans);
+    font-weight:800;
+    font-size:clamp(34px,7vw,60px);
+    letter-spacing:-.02em;
+    line-height:.98;
+    margin:12px 0 6px;
+    color:var(--ink);
+  }
+  .hero h1 .arrow{color:var(--amber);font-weight:600}
+  .hero .sub{
+    font-family:var(--mono);
+    font-size:13px;color:var(--dusk);
+    letter-spacing:.04em;
+    margin-top:10px;
+  }
+  .ridge{width:100%;height:60px;display:block;margin:18px 0 0}
+
+  /* ---------- LEGEND / KEY ---------- */
+  .key{
+    display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:center;
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.03em;
+    color:var(--dusk);padding:14px 0 6px;
+  }
+  .key span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:11px;height:11px;border-radius:50%;flex:none}
+  .dot.hike{background:var(--hike)}
+  .dot.drive{background:var(--drive)}
+  .dot.stop{background:var(--stop)}
+  .dot.show{background:var(--show)}
+  .sq{width:11px;height:11px;flex:none;border-radius:2px}
+
+  /* ---------- PHASE HEADERS ---------- */
+  .phase{
+    display:flex;align-items:center;gap:14px;
+    margin:44px 0 6px;
+  }
+  .phase .pl{
+    font-family:var(--mono);font-size:12px;font-weight:600;
+    letter-spacing:.2em;text-transform:uppercase;
+    color:#fff;background:var(--dusk);
+    padding:5px 12px;border-radius:3px;white-space:nowrap;
+  }
+  .phase.out .pl{background:var(--pine)}
+  .phase.ret .pl{background:var(--rust)}
+  .phase .line{height:1px;background:var(--line);flex:1}
+  .phase .meta{font-family:var(--mono);font-size:11.5px;color:var(--sky)}
+
+  /* ---------- DAY CARD ---------- */
+  .day{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:10px;
+    margin:16px 0;
+    overflow:hidden;
+    box-shadow:0 1px 0 rgba(20,32,31,.04);
+  }
+  .day > summary{
+    list-style:none;cursor:pointer;
+    padding:16px 18px;
+    display:flex;align-items:baseline;gap:14px;
+    background:linear-gradient(180deg, var(--paper) 0%, var(--paper2) 100%);
+    border-bottom:1px solid transparent;
+    transition:border-color .2s;
+  }
+  .day[open] > summary{border-bottom-color:var(--line)}
+  .day > summary::-webkit-details-marker{display:none}
+  .daynum{
+    font-family:var(--mono);font-size:11px;font-weight:600;
+    letter-spacing:.15em;color:var(--spruce);
+  }
+  .daytitle{font-weight:750;font-size:21px;letter-spacing:-.01em;flex:1;min-width:0}
+  .daydate{font-family:var(--mono);font-size:14px;color:var(--dusk);white-space:nowrap}
+  .sunwx{
+    font-family:var(--mono);font-size:11px;color:var(--sky);
+    padding:0 18px 0;margin-top:-2px;
+  }
+  .chev{font-family:var(--mono);color:var(--amber);font-size:13px;transition:transform .2s}
+  .day[open] .chev{transform:rotate(90deg)}
+
+  /* ---------- TIMELINE INSIDE DAY ---------- */
+  .rail{padding:8px 18px 18px}
+  .ev{
+    position:relative;
+    padding:9px 0 9px 92px;
+    min-height:34px;
+  }
+  .ev::before{ /* vertical line */
+    content:"";position:absolute;left:70px;top:0;bottom:0;width:2px;
+    background:var(--line);
+  }
+  .ev:first-child::before{top:14px}
+  .ev:last-child::before{bottom:auto;height:14px}
+  .ev .t{
+    position:absolute;left:0;top:9px;width:60px;text-align:right;
+    font-family:var(--mono);font-size:13px;font-weight:600;color:var(--dusk);
+    letter-spacing:-.02em;
+  }
+  .ev .node{
+    position:absolute;left:64px;top:11px;width:14px;height:14px;border-radius:50%;
+    background:var(--paper);border:2.5px solid var(--drive);z-index:1;
+  }
+  .ev.hike .node{border-color:var(--hike);background:var(--hike)}
+  .ev.stop .node{border-color:var(--stop);background:var(--stop)}
+  .ev.drive .node{border-color:var(--drive)}
+  .ev.show .node{border-color:var(--show);background:var(--show)}
+  .ev.meal .node{border-color:var(--amber);background:var(--paper)}
+  .ev .h{font-weight:650;font-size:16px;letter-spacing:-.005em}
+  .ev .d{font-size:14.5px;color:#4a5654;margin-top:2px}
+  .ev .tag{
+    font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    padding:1px 6px;border-radius:3px;margin-left:7px;vertical-align:1px;font-weight:600;
+  }
+  .tag.hike{background:rgba(46,107,87,.14);color:var(--pine)}
+  .tag.drive{background:rgba(138,122,86,.16);color:#6d5f3e}
+  .tag.stop{background:rgba(200,121,46,.16);color:#8a4f16}
+  .tag.meal{background:rgba(200,121,46,.1);color:#8a4f16}
+  .tag.show{background:rgba(122,59,107,.14);color:var(--show)}
+  .ev .mi{font-family:var(--mono);font-size:11px;color:var(--sky);margin-top:2px}
+
+  /* link chips */
+  .lk{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
+  .lk a{
+    display:inline-flex;align-items:center;gap:4px;
+    font-family:var(--mono);font-size:12px;letter-spacing:.02em;font-weight:600;
+    text-decoration:none;padding:4px 10px;border-radius:20px;
+    border:1px solid var(--line);background:var(--paper);color:var(--dusk);
+    transition:all .13s;white-space:nowrap;
+  }
+  .lk a:hover,.lk a:active{border-color:var(--spruce);color:var(--pine);background:#fff}
+  .lk a.map{border-color:rgba(91,122,153,.4);color:#3f5a75}
+  .lk a.map:hover{border-color:var(--sky);background:rgba(91,122,153,.06)}
+  /* Google Maps brand chip */
+  .lk a.gmap{border-color:#4285F4;color:#1a73e8;background:#fff}
+  .lk a.gmap:hover,.lk a.gmap:active{background:#e8f0fe;border-color:#1a73e8}
+  .lk a.gmap .ic{color:#34A853;font-size:12px}
+  /* Waze brand chip */
+  .lk a.waze{border-color:#33CCFF;color:#0b93c4;background:#fff}
+  .lk a.waze:hover,.lk a.waze:active{background:#e6f9ff;border-color:#059BD6}
+  .lk a.waze .ic{color:#33CCFF;font-size:12px}
+  .lk a.trail{border-color:rgba(46,107,87,.4);color:var(--pine)}
+  .lk a.trail:hover{border-color:var(--hike);background:rgba(46,107,87,.07)}
+  .lk a.eat{border-color:rgba(200,121,46,.4);color:#8a4f16}
+  .lk a.eat:hover{border-color:var(--amber);background:rgba(200,121,46,.07)}
+  .lk a.tix{border-color:rgba(122,59,107,.4);color:var(--show)}
+  .lk a.tix:hover{border-color:var(--show);background:rgba(122,59,107,.07)}
+  .lk a .ic{font-size:11px;line-height:1}
+
+  /* drive connector label */
+  .leg{
+    padding:2px 0 2px 92px;position:relative;
+  }
+  .leg::before{content:"";position:absolute;left:70px;top:0;bottom:0;width:2px;
+    background:repeating-linear-gradient(180deg,var(--drive) 0 4px,transparent 4px 8px);opacity:.55}
+  .leg .lt{font-family:var(--mono);font-size:11px;color:var(--drive);font-weight:600}
+
+  /* ---------- CALLOUTS ---------- */
+  .callout{
+    margin:10px 18px;padding:11px 14px;border-radius:8px;
+    font-size:12.5px;display:flex;gap:10px;align-items:flex-start;
+    border:1px solid;
+  }
+  .callout .ci{font-family:var(--mono);font-weight:700;font-size:11px;letter-spacing:.05em;flex:none;margin-top:1px}
+  .callout.tz{background:rgba(43,58,84,.07);border-color:rgba(43,58,84,.25);color:var(--dusk)}
+  .callout.tz .ci{color:var(--dusk)}
+  .callout.fire{background:rgba(168,67,42,.07);border-color:rgba(168,67,42,.3);color:#7a2f1c}
+  .callout.fire .ci{color:var(--rust)}
+  .callout.book{background:rgba(200,121,46,.09);border-color:rgba(200,121,46,.35);color:#7a4415}
+  .callout.book .ci{color:var(--amber)}
+  .callout b{font-weight:700}
+
+  /* ---------- BANFF INTERLUDE ---------- */
+  .interlude{
+    text-align:center;margin:40px 0;padding:26px 20px;
+    border:1.5px dashed var(--spruce);border-radius:12px;
+    background:rgba(46,107,87,.05);
+  }
+  .interlude .il-e{font-family:var(--mono);font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--spruce);font-weight:600}
+  .interlude h3{font-size:22px;font-weight:800;margin:8px 0 6px;letter-spacing:-.01em}
+  .interlude p{font-size:13.5px;color:#4a5654;max-width:520px;margin:0 auto}
+  .interlude .days4{font-family:var(--mono);font-size:12px;color:var(--dusk);margin-top:10px;letter-spacing:.03em}
+
+  /* ---------- FOOTER ---------- */
+  footer{margin-top:50px;padding-top:20px;border-top:1px solid var(--line);
+    font-family:var(--mono);font-size:11px;color:var(--sky);text-align:center;line-height:1.7}
+  .checks{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:14px 0}
+  .checks a{
+    font-family:var(--mono);font-size:11px;color:var(--dusk);text-decoration:none;
+    border:1px solid var(--line);border-radius:20px;padding:5px 12px;
+    background:var(--paper);transition:all .15s;
+  }
+  .checks a:hover{border-color:var(--amber);color:var(--rust)}
+
+  .expandbar{display:flex;justify-content:center;gap:10px;margin:8px 0 0}
+  .expandbar button{
+    font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+    background:none;border:1px solid var(--line);border-radius:20px;
+    padding:5px 14px;color:var(--dusk);cursor:pointer;transition:all .15s;
+  }
+  .expandbar button:hover{border-color:var(--spruce);color:var(--pine)}
+
+  /* today bar */
+  .todaybar{
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;
+    margin:16px 0 4px;padding:12px 16px;border-radius:10px;
+    background:linear-gradient(180deg,rgba(46,107,87,.1),rgba(46,107,87,.05));
+    border:1px solid rgba(46,107,87,.3);
+  }
+  .todaybar .now{
+    font-family:var(--mono);font-size:12px;color:var(--pine);font-weight:600;letter-spacing:.02em;
+    display:flex;align-items:center;gap:8px;
+  }
+  .todaybar .now .pulse{
+    width:8px;height:8px;border-radius:50%;background:var(--hike);flex:none;
+    box-shadow:0 0 0 0 rgba(46,107,87,.5);animation:pulse 2.2s infinite;
+  }
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(46,107,87,.45)}70%{box-shadow:0 0 0 9px rgba(46,107,87,0)}100%{box-shadow:0 0 0 0 rgba(46,107,87,0)}}
+  .todaybar button.jump{
+    font-family:var(--mono);font-size:11.5px;font-weight:600;letter-spacing:.04em;
+    background:var(--pine);color:#fff;border:none;border-radius:20px;
+    padding:7px 16px;cursor:pointer;transition:all .15s;
+  }
+  .todaybar button.jump:hover{background:var(--spruce)}
+  .todaybar.pre .now{color:var(--dusk)}
+  .todaybar.pre .now .pulse{background:var(--amber);animation:none;box-shadow:none}
+  .todaybar.post{background:rgba(43,58,84,.06);border-color:rgba(43,58,84,.2)}
+  .todaybar.post .now{color:var(--dusk)}
+  .todaybar.post .now .pulse{background:var(--sky);animation:none;box-shadow:none}
+  /* current-day card highlight */
+  details.day.is-today{border-color:var(--spruce);box-shadow:0 0 0 2px rgba(46,107,87,.18)}
+  details.day.is-today > summary{background:linear-gradient(180deg,rgba(46,107,87,.09),rgba(46,107,87,.03))}
+  details.day.is-today .daynum{color:var(--rust)}
+  .todaypill{
+    font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+    background:var(--hike);color:#fff;padding:2px 7px;border-radius:20px;margin-left:8px;vertical-align:2px;
+  }
+
+  /* offline-prep collapsible */
+  .prep{
+    margin:16px 0 4px;border:1px solid rgba(43,58,84,.3);border-radius:10px;overflow:hidden;
+    background:linear-gradient(180deg,rgba(43,58,84,.06),rgba(43,58,84,.02));
+  }
+  .prep > summary{
+    list-style:none;cursor:pointer;padding:13px 16px;
+    display:flex;align-items:center;gap:10px;
+    font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:.03em;color:var(--dusk);
+  }
+  .prep > summary::-webkit-details-marker{display:none}
+  .prep > summary .pc{font-size:14px}
+  .prep > summary .chev2{margin-left:auto;color:var(--sky);font-size:12px;transition:transform .2s}
+  .prep[open] > summary .chev2{transform:rotate(90deg)}
+  .prep .body{padding:2px 16px 16px}
+  .prep .grp{margin-top:12px}
+  .prep .grp h4{
+    font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--pine);font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:7px;
+  }
+  .prep .grp h4 .b{width:9px;height:9px;border-radius:2px;flex:none}
+  .prep ul{list-style:none;display:flex;flex-direction:column;gap:5px}
+  .prep li{
+    font-size:13px;color:#3a4644;padding-left:24px;position:relative;line-height:1.45;
+  }
+  .prep li::before{
+    content:"";position:absolute;left:0;top:2px;width:15px;height:15px;border-radius:4px;
+    border:1.5px solid var(--line);background:var(--paper);
+  }
+  .prep li b{font-weight:700;color:var(--ink)}
+  .prep .note{
+    margin-top:12px;padding:9px 12px;border-radius:7px;font-size:12px;
+    background:rgba(168,67,42,.07);border:1px solid rgba(168,67,42,.25);color:#7a2f1c;
+  }
+
+  @media (max-width:520px){
+    .ev{padding-left:82px}
+    .ev .t{width:52px;font-size:12px}
+    .ev::before{left:62px}
+    .ev .node{left:56px}
+    .leg{padding-left:82px}
+    .leg::before{left:62px}
+    .daytitle{font-size:18.5px}
+    .sunwx{font-size:11px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">Redmond · BC · Alberta · Rockies</div>
+    <h1>Seattle <span class="arrow">⇄</span> Banff</h1>
+    <div class="sub">Aug 7–15, 2026 · drive in via Jasper · out via Yoho &amp; Revelstoke · ends at the show</div>
+    <svg class="ridge" viewBox="0 0 820 60" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0,60 L0,34 L60,40 L120,20 L180,44 L240,14 L300,38 L360,8 L420,30 L480,18 L540,42 L600,22 L660,36 L720,12 L780,32 L820,24 L820,60 Z"
+            fill="none" stroke="#1f4a3f" stroke-width="1.5" opacity="0.5"/>
+      <path d="M0,60 L0,50 L60,52 L120,44 L180,54 L240,40 L300,50 L360,36 L420,48 L480,42 L540,54 L600,46 L660,52 L720,40 L780,50 L820,46 L820,60 Z"
+            fill="#1f4a3f" opacity="0.08"/>
+    </svg>
+  </header>
+
+  <div class="key">
+    <span><i class="dot hike"></i>Hike</span>
+    <span><i class="dot drive"></i>Drive leg</span>
+    <span><i class="dot stop"></i>Sight / falls</span>
+    <span><i class="dot" style="background:var(--amber);border:2px solid var(--amber);background:var(--paper)"></i>Meal</span>
+    <span><i class="dot show"></i>The show</span>
+  </div>
+
+  <div class="key" style="border-top:1px dashed var(--line);padding-top:12px;margin-top:2px">
+    <span style="color:#1a73e8"><b>◉ Google</b></span>
+    <span style="color:#0b93c4"><b>➤ Waze</b></span>
+    <span style="color:var(--pine)"><b>△ AllTrails</b></span>
+    <span style="color:#8a4f16"><b>▤ Menu</b></span>
+    <span style="color:var(--show)"><b>◈ Tickets</b></span>
+    <span style="color:var(--sky)">— tap opens the app</span>
+  </div>
+
+  <div class="expandbar">
+    <button id="expandAll">Expand all</button>
+    <button id="collapseAll">Collapse all</button>
+  </div>
+
+  <div class="todaybar" id="todaybar" hidden>
+    <span class="now"><span class="pulse"></span><span id="nowText">—</span></span>
+    <button class="jump" id="jumpToday">Jump to today ↓</button>
+  </div>
+
+  <!-- ================= OUTBOUND ================= -->
+  <div class="phase out">
+    <span class="pl">Outbound → Banff</span>
+    <span class="line"></span>
+    <span class="meta">Fri–Sun · 3 days</span>
+  </div>
+
+  <!-- FRIDAY -->
+  <details class="day" data-date="2026-08-07" open>
+    <summary>
+      <span class="daynum">D1</span>
+      <span class="daytitle">Redmond → Valemount</span>
+      <span class="daydate">Fri 8/7</span>
+      <span class="chev">▶</span>
+    </summary>
+    <div class="sunwx">☀ rise 5:53a Redmond · ☾ set 8:38p Valemount · all times PT</div>
+
+    <div class="callout fire">
+      <span class="ci">FIRE ✽</span>
+      <span>Big Bar complex (Clinton) has Hwy 97 &amp; parts of Hwy 1 closed NW of Kamloops — <b>your route (Hwy 5) avoids it</b>, but check <b>DriveBC</b> the night before &amp; that morning. Wells Gray stops (Spahats/Triple Decker) are the smoke-exposed ones — have a "skip to Valemount" fallback.</span>
+    </div>
+
+    <div class="rail">
+      <div class="ev drive"><span class="t">5:00a</span><span class="node"></span>
+        <div class="h">Depart Redmond<span class="tag drive">6am HARD</span></div>
+        <div class="d">Coffee only — brunch waits for Kamloops. Aim for 5, worst case 6.</div>
+        <div class="lk"><a class="gmap" href="https://maps.app.goo.gl/3gytfngKaRCzWYZM9" target="_blank" rel="noopener"><span class="ic">◉</span>Leg 1 → Kamloops</a><a class="waze" href="https://waze.com/ul?q=Chook%20Eatery%2C%20Kamloops%20BC&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Kamloops</a></div>
+      </div>
+      <div class="leg"><span class="lt">↓ ~4.5 hr · Hwy 5 · + border (buffer 30–60 min)</span></div>
+      <div class="ev meal"><span class="t">10–11a</span><span class="node"></span>
+        <div class="h">Chook Eatery, Kamloops<span class="tag meal">brunch</span></div>
+        <div class="d">Quick cannabis stop nearby (Dazed) optional.</div>
+        <div class="lk"><a class="eat" href="https://chookeatery.ca/" target="_blank" rel="noopener"><span class="ic">▤</span>Chook menu</a><a class="eat" href="https://dazedcannabis.ca/" target="_blank" rel="noopener"><span class="ic">▤</span>Dazed</a><a class="gmap" href="https://maps.app.goo.gl/MjHsCweYBftk69jU8" target="_blank" rel="noopener"><span class="ic">◉</span>→ Spahats</a><a class="waze" href="https://waze.com/ul?q=Spahats%20Falls%2C%20BC&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Spahats</a></div>
+      </div>
+      <div class="leg"><span class="lt">↓ ~2 hr</span></div>
+      <div class="ev stop"><span class="t">2:30p</span><span class="node"></span>
+        <div class="h">Spahats Falls<span class="tag stop">falls</span></div>
+        <div class="d">Quick ½-mi loop to the viewpoint.</div>
+        <div class="lk"><a class="trail" href="https://www.alltrails.com/explore/trail/canada/british-columbia/spahat-falls" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="gmap" href="https://maps.app.goo.gl/nFiaUrPhpuzGuyTR9" target="_blank" rel="noopener"><span class="ic">◉</span>→ Triple Decker</a><a class="waze" href="https://waze.com/ul?q=Candle%20Creek%20Falls%2C%20BC&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Triple Decker</a></div>
+      </div>
+      <div class="leg"><span class="lt">↓ 5 min</span></div>
+      <div class="ev hike"><span class="t">3:05p</span><span class="node"></span>
+        <div class="h">Triple Decker / Candle Creek Falls<span class="tag hike">hike</span></div>
+        <div class="d">~3 mi, allot ~90 min.</div>
+        <div class="lk"><a class="trail" href="https://www.alltrails.com/trail/canada/british-columbia/candle-creek-falls" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="gmap" href="https://maps.app.goo.gl/vwF2tXFXqZqUgX6aA" target="_blank" rel="noopener"><span class="ic">◉</span>→ Valemount</a><a class="waze" href="https://waze.com/ul?q=Comfort%20Inn%20Valemount&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Valemount</a></div>
+      </div>
+      <div class="leg"><span class="lt">↓ ~2 hr</span></div>
+      <div class="ev stop"><span class="t">6:45p</span><span class="node"></span>
+        <div class="h">Check in — Comfort Inn, Valemount<span class="tag stop">hotel</span></div>
+        <div class="lk"><a class="gmap" href="https://maps.app.goo.gl/MHdXF9YBTf8ZW3ye8" target="_blank" rel="noopener"><span class="ic">◉</span>→ Rearguard Falls</a><a class="waze" href="https://waze.com/ul?q=Rearguard%20Falls%2C%20BC&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Rearguard</a></div>
+      </div>
+      <div class="ev stop"><span class="t">7:15p</span><span class="node"></span>
+        <div class="h">Rearguard Falls<span class="tag stop">falls</span></div>
+        <div class="d">Quick ½-mi out-and-back. Last salmon run's western limit.</div>
+        <div class="lk"><a class="trail" href="https://www.alltrails.com/explore/trail/canada/british-columbia/rearguard-falls-trail" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a></div>
+      </div>
+      <div class="ev meal"><span class="t">8:00p</span><span class="node"></span>
+        <div class="h">Dinner in Valemount<span class="tag meal">eat</span></div>
+        <div class="d">Most close by 9.</div>
+        <div class="lk"><a class="eat" href="https://www.caribougrill.com/" target="_blank" rel="noopener"><span class="ic">▤</span>Caribou Grill</a><a class="eat" href="https://maps.app.goo.gl/jDrsj5yc7awWWs56A" target="_blank" rel="noopener"><span class="ic">▤</span>Funky Goat</a><a class="eat" href="https://glacierfirepizzeria.ca/menu" target="_blank" rel="noopener"><span class="ic">▤</span>Glacier Fire ·8:30</a><a class="eat" href="https://www.themoosepubvalemount.com/food" target="_blank" rel="noopener"><span class="ic">▤</span>Moose Pub</a><a class="eat" href="https://maps.app.goo.gl/yj34mX4y9d5c67xd6" target="_blank" rel="noopener"><span class="ic">▤</span>BoShays</a></div>
+      </div>
+      <div class="ev"><span class="t">9:15p</span><span class="node" style="border-color:var(--dusk);background:var(--dusk)"></span>
+        <div class="h">Crash 💤</div>
+        <div class="d">Likely back earlier (7–8p) if the day runs ahead — it usually does.</div>
+      </div>
+    </div>
+  </details>
+
+  <!-- SATURDAY -->
+  <details class="day" data-date="2026-08-08">
+    <summary>
+      <span class="daynum">D2</span>
+      <span class="daytitle">Valemount → Jasper</span>
+      <span class="daydate">Sat 8/8</span>
+      <span class="chev">▶</span>
+    </summary>
+    <div class="sunwx">☀ rise 5:27a Valemount · ☾ set 9:32p Jasper · breakfast: eggs + steak, packed</div>
+
+    <div class="callout tz">
+      <span class="ci">TZ ⏱</span>
+      <span>Cross into <b>Alberta = Mountain Time, lose 1 hr</b> ~75 mi east of Valemount. Leaving 5:00a PT = 6:00a MT. All Sat times below are local-on-arrival.</span>
+    </div>
+
+    <div class="rail">
+      <div class="ev drive"><span class="t">5:00a</span><span class="node"></span>
+        <div class="h">Depart Valemount<span class="tag drive">6am MT hard</span></div>
+        <div class="d">Beat the Saturday parking crunch — lot fills before 10a.</div>
+        <div class="lk"><a class="gmap" href="https://maps.app.goo.gl/216iiB6QYhxjTtDHA" target="_blank" rel="noopener"><span class="ic">◉</span>→ Bald Hills TH</a><a class="waze" href="https://waze.com/ul?q=Bald%20Hills%20Trailhead%2C%20Jasper&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Bald Hills TH</a></div>
+      </div>
+      <div class="leg"><span class="lt">↓ ~2.5 hr incl. time-zone loss</span></div>
+      <div class="ev hike"><span class="t">8–8:30a</span><span class="node"></span>
+        <div class="h">Bald Hills Loop<span class="tag hike">big hike</span></div>
+        <div class="d">The full loop with the summit ridge — this is a real 6-hour day, not a quick stop.</div>
+        <div class="mi">plan 8:30a–2:30p on trail</div>
+        <div class="lk"><a class="trail" href="https://www.alltrails.com/trail/canada/alberta/bald-hills-trail-loop" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="gmap" href="https://maps.app.goo.gl/pQggYb9eSwUWaX4d8" target="_blank" rel="noopener"><span class="ic">◉</span>→ Jasper</a><a class="waze" href="https://waze.com/ul?q=Jasper%2C%20AB&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Jasper</a></div>
+      </div>
+      <div class="leg"><span class="lt">↓ to Jasper</span></div>
+      <div class="ev stop"><span class="t">3:30p</span><span class="node"></span>
+        <div class="h">Jasper — late lunch + check in<span class="tag stop">Jasper Inn</span></div>
+        <div class="d">Options below.</div>
+        <div class="lk"><a class="eat" href="https://madgrizzly.ca/menu-1" target="_blank" rel="noopener"><span class="ic">▤</span>Mad Grizzly</a><a class="eat" href="https://www.wafflato.ca/jasper-menu" target="_blank" rel="noopener"><span class="ic">▤</span>Wafflato</a><a class="eat" href="https://somethingelsejasper.com/" target="_blank" rel="noopener"><span class="ic">▤</span>Something Else</a><a class="eat" href="https://www.earls.ca/locations/jasper/menu/kitchen" target="_blank" rel="noopener"><span class="ic">▤</span>Earls</a><a class="eat" href="https://theravenbistro.com/lunch" target="_blank" rel="noopener"><span class="ic">▤</span>Raven Bistro</a><a class="eat" href="https://www.loulous.ca/menus/" target="_blank" rel="noopener"><span class="ic">▤</span>Loulou's</a></div>
+      </div>
+      <div class="ev stop"><span class="t">eve</span><span class="node"></span>
+        <div class="h">Pyramid &amp; Patricia Lakes<span class="tag stop">views</span></div>
+        <div class="d">Skip the full loop after Bald Hills — just grab the lake views. Play it by ear before/after dinner.</div>
+        <div class="lk"><a class="trail" href="https://www.alltrails.com/trail/canada/alberta/pyramid-lake-loop" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails (ref)</a></div>
+      </div>
+    </div>
+  </details>
+
+  <!-- SUNDAY -->
+  <details class="day" data-date="2026-08-09">
+    <summary>
+      <span class="daynum">D3</span>
+      <span class="daytitle">Jasper → Icefields Pkwy → Canmore</span>
+      <span class="daydate">Sun 8/9</span>
+      <span class="chev">▶</span>
+    </summary>
+    <div class="sunwx">☀ rise 6:24a Jasper · ☾ set 9:13p Canmore · the scenic centerpiece day</div>
+
+    <div class="callout fire">
+      <span class="ci">SMOKE ✽</span>
+      <span>This day is <b>all about the views</b> — Athabasca, Sunwapta, Wilcox. Widespread smoke would flatten the payoff. Check the <b>Jasper/Icefields AQHI forecast</b> — if it's socked in, the falls still work but temper Wilcox expectations.</span>
+    </div>
+    <div class="callout book">
+      <span class="ci">BOOK ◎</span>
+      <span><b>8:00a MT today</b> = Moraine shuttle release for Aug 11. You'll be <b>driving</b> — designate a booker with the Parks Canada site pre-loaded &amp; ready. (Louise release is 8a tomorrow, Aug 10.)</span>
+    </div>
+
+    <div class="rail">
+      <div class="ev drive"><span class="t">6:00a</span><span class="node"></span>
+        <div class="h">Depart Jasper<span class="tag drive">dawn</span></div>
+        <div class="lk"><a class="gmap" href="https://maps.app.goo.gl/4Gfrz5JXMyqEdK317" target="_blank" rel="noopener"><span class="ic">◉</span>→ Five Lakes</a><a class="waze" href="https://waze.com/ul?q=Valley%20of%20the%20Five%20Lakes%20Trailhead%2C%20Jasper&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Five Lakes</a></div>
+      </div>
+      <div class="leg"><span class="lt">↓ 15 min</span></div>
+      <div class="ev hike"><span class="t">6:15a</span><span class="node"></span>
+        <div class="h">Valley of the Five Lakes<span class="tag hike">hike</span></div>
+        <div class="d">First real stop. <b>The cut candidate</b> if legs are shot after two dawn starts.</div>
+        <div class="lk"><a class="trail" href="https://www.alltrails.com/trail/canada/alberta/valley-of-the-five-lakes-and-first-lake" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="gmap" href="https://maps.app.goo.gl/Tz8BbxHcxtG8Wa6j6" target="_blank" rel="noopener"><span class="ic">◉</span>→ Athabasca</a><a class="waze" href="https://waze.com/ul?q=Athabasca%20Falls%2C%20AB&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Athabasca</a></div>
+      </div>
+      <div class="leg"><span class="lt">↓ · stop at Athabasca Pass Lookout</span></div>
+      <div class="ev stop"><span class="t">9:00a</span><span class="node"></span>
+        <div class="h">Athabasca Falls<span class="tag stop">falls</span></div>
+        <div class="lk"><a class="trail" href="https://www.alltrails.com/trail/canada/alberta/athabasca-falls" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="gmap" href="https://maps.app.goo.gl/frQdg9rmXSuUwB558" target="_blank" rel="noopener"><span class="ic">◉</span>→ Sunwapta</a><a class="waze" href="https://waze.com/ul?q=Sunwapta%20Falls%2C%20AB&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Sunwapta</a></div>
+      </div>
+      <div class="leg"><span class="lt">↓ · stop at Goats &amp; Glacier Lookout</span></div>
+      <div class="ev stop"><span class="t">9:50a</span><span class="node"></span>
+        <div class="h">Sunwapta Falls<span class="tag stop">falls</span></div>
+        <div class="lk"><a class="trail" href="https://www.alltrails.com/trail/canada/alberta/sunwapta-falls" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a></div>
+      </div>
+      <div class="leg"><span class="lt">↓ ~40 min</span></div>
+      <div class="ev hike"><span class="t">11:00a</span><span class="node"></span>
+        <div class="h">Wilcox Pass<span class="tag hike">best hike</span></div>
+        <div class="d">The day's high point — Columbia Icefield panorama. Plan 11a–2:30p; zero margin, so don't rush it.</div>
+        <div class="lk"><a class="trail" href="https://www.alltrails.com/trail/canada/alberta/wilcox-viewpoint-via-wilcox-pass" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a></div>
+      </div>
+      <div class="ev stop"><span class="t">~2:30p</span><span class="node"></span>
+        <div class="h">Columbia Icefield ground view / Skywalk<span class="tag stop">optional</span></div>
+        <div class="lk"><a class="tix" href="https://www.banffjaspercollection.com/attractions/columbia-icefield-skywalk/tickets/" target="_blank" rel="noopener"><span class="ic">◈</span>Skywalk tickets</a></div>
+      </div>
+      <div class="leg"><span class="lt">↓ HARD depart by 3:00p · ~2 hr</span></div>
+      <div class="ev stop"><span class="t">5:00p</span><span class="node"></span>
+        <div class="h">Arrive Canmore — house<span class="tag stop">basecamp</span></div>
+        <div class="d">Hoodoos hikeable from the door if anyone's got legs left. Likely cooked — no shame in calling it.</div>
+        <div class="lk"><a class="gmap" href="https://maps.app.goo.gl/qmMyy3AXTzN8CHxx8" target="_blank" rel="noopener"><span class="ic">◉</span>Canmore trails</a><a class="waze" href="https://waze.com/ul?q=Canmore%2C%20AB&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Canmore</a><a class="trail" href="https://www.alltrails.com/explore/poi/canada/alberta/canmore/canmore-hoodoos" target="_blank" rel="noopener"><span class="ic">△</span>Hoodoos</a></div>
+      </div>
+    </div>
+  </details>
+
+  <!-- ================= BANFF INTERLUDE ================= -->
+  <div class="interlude">
+    <div class="il-e">◆ Basecamp ◆</div>
+    <h3>Banff — 4 Hiking Days</h3>
+    <p>Aug 11–14, covered in the separate Banff plan: Moraine (Larch Valley / Sentinel Pass), Lake Louise (Plain of Six Glaciers loop), a flex/townsite day, and Cirque Peak on the Icefields. Two shuttle bookings at 8:00a MT — Aug 9 &amp; Aug 10.</p>
+    <div class="days4">Aug 10 arrival buffer · Aug 11–14 hikes · Aug 14 pm → return staging</div>
+    <div class="lk" style="justify-content:center;margin-top:12px"><a class="tix" href="https://reservation.pc.gc.ca/" target="_blank" rel="noopener"><span class="ic">◈</span>Parks Canada shuttle booking</a></div>
+  </div>
+
+  <!-- ================= RETURN ================= -->
+  <div class="phase ret">
+    <span class="pl">Return → the show</span>
+    <span class="line"></span>
+    <span class="meta">Fri–Sat · 2 days</span>
+  </div>
+
+  <!-- RETURN FRIDAY -->
+  <details class="day" data-date="2026-08-14" open>
+    <summary>
+      <span class="daynum">R1</span>
+      <span class="daytitle">Canmore → Yoho → Revelstoke → Kelowna</span>
+      <span class="daydate">Fri 8/14</span>
+      <span class="chev">▶</span>
+    </summary>
+    <div class="sunwx">☀ rise 6:26a Canmore · ☾ set 8:17p Kelowna · the "greatest hits" drive home</div>
+
+    <div class="callout tz">
+      <span class="ci">TZ ⏱</span>
+      <span>Cross back into <b>BC = Pacific Time, gain 1 hr</b> heading west. Depart 6:00a MT, arrive Emerald Lake 6:20a <b>PT</b> — the clock rolls back in your favor all day.</span>
+    </div>
+
+    <div class="rail">
+      <div class="ev drive"><span class="t">6:00a</span><span class="node"></span>
+        <div class="h">Depart — A Bear &amp; Bison Inn<span class="tag drive">dawn</span></div>
+        <div class="lk"><a class="gmap" href="https://maps.app.goo.gl/TWJaKnyM4jNiD1dg9" target="_blank" rel="noopener"><span class="ic">◉</span>→ Emerald Lake</a><a class="waze" href="https://waze.com/ul?q=Emerald%20Lake%2C%20Yoho&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Emerald Lake</a></div>
+      </div>
+      <div class="leg"><span class="lt">↓ ~1:20 · gain 1 hr crossing into BC</span></div>
+      <div class="ev hike"><span class="t">6:20a</span><span class="node"></span>
+        <div class="h">Emerald Lake Loop, Yoho<span class="tag hike">hike</span></div>
+        <div class="d">Optional full loop ~2 hr. Glassy morning water before crowds.</div>
+        <div class="lk"><a class="trail" href="https://www.alltrails.com/trail/canada/british-columbia/emerald-lake-loop" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="gmap" href="https://maps.app.goo.gl/4gRcBEbMnfz9vNau8" target="_blank" rel="noopener"><span class="ic">◉</span>→ Natural Bridge</a><a class="waze" href="https://waze.com/ul?q=Natural%20Bridge%2C%20Yoho%20BC&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Natural Bridge</a></div>
+      </div>
+      <div class="leg"><span class="lt">↓ short</span></div>
+      <div class="ev stop"><span class="t">8:20a</span><span class="node"></span>
+        <div class="h">Natural Bridge<span class="tag stop">roadside</span></div>
+        <div class="lk"><a class="trail" href="https://www.alltrails.com/trail/canada/british-columbia/road-side-stop-at-natural-bridge" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="gmap" href="https://maps.app.goo.gl/9ULApd5UZyJjegjVA" target="_blank" rel="noopener"><span class="ic">◉</span>→ Glacier NP</a><a class="waze" href="https://waze.com/ul?q=Rogers%20Pass%20Discovery%20Centre%2C%20BC&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Glacier NP</a></div>
+      </div>
+      <div class="leg"><span class="lt">↓ · quick stop at Rogers Pass Centre</span></div>
+      <div class="ev hike"><span class="t">10:45a</span><span class="node"></span>
+        <div class="h">Marion Lake + Meeting of the Waters<span class="tag hike">hike</span></div>
+        <div class="d">Glacier NP (BC). Wrap ~12:45p.</div>
+        <div class="lk"><a class="trail" href="https://www.alltrails.com/explore/custom-routes/marion-lake-with-meeting-of-the-waters-d45030b" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="gmap" href="https://maps.app.goo.gl/6YVc7zQ5gnkAReJk6" target="_blank" rel="noopener"><span class="ic">◉</span>→ Mt Revelstoke</a><a class="waze" href="https://waze.com/ul?q=Mount%20Revelstoke%20National%20Park&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Mt Revelstoke</a></div>
+      </div>
+      <div class="leg"><span class="lt">↓ to Mt Revelstoke NP</span></div>
+      <div class="ev hike"><span class="t">2:15p</span><span class="node"></span>
+        <div class="h">Mt Revelstoke — Upper Summit Trail<span class="tag hike">short hike</span></div>
+        <div class="d">Drive the Meadows-in-the-Sky parkway up. Food in Revelstoke before or after. Depart trail ~3:30p.</div>
+        <div class="lk"><a class="trail" href="https://www.alltrails.com/trail/canada/british-columbia/upper-summit-trail" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="gmap" href="https://maps.app.goo.gl/8XHP7TVpDg7MQuEk8" target="_blank" rel="noopener"><span class="ic">◉</span>→ Kelowna</a><a class="waze" href="https://waze.com/ul?q=Kelowna%2C%20BC&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Kelowna</a></div>
+      </div>
+      <div class="leg"><span class="lt">↓ depart Revelstoke by 4:00p · ~3 hr</span></div>
+      <div class="ev stop"><span class="t">7:00p</span><span class="node"></span>
+        <div class="h">Kelowna — Fairfield Inn &amp; Suites<span class="tag stop">hotel</span></div>
+        <div class="d">Late food options available. Feet up.</div>
+        <div class="lk"><a class="gmap" href="https://maps.app.goo.gl/fNWgHzDm9M4oFmUZ6" target="_blank" rel="noopener"><span class="ic">◉</span>Fairfield Inn</a><a class="waze" href="https://waze.com/ul?q=Fairfield%20Inn%20%26%20Suites%20Kelowna&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Fairfield Inn</a></div>
+      </div>
+    </div>
+  </details>
+
+  <!-- RETURN SATURDAY -->
+  <details class="day" data-date="2026-08-15" open>
+    <summary>
+      <span class="daynum">R2</span>
+      <span class="daytitle">Kelowna → Bellingham → Show</span>
+      <span class="daydate">Sat 8/15</span>
+      <span class="chev">▶</span>
+    </summary>
+    <div class="sunwx">☀ rise 5:48a Kelowna · Starbucks/Tim's open 5:30a if rolling early</div>
+
+    <div class="callout fire">
+      <span class="ci">FIRE ✽</span>
+      <span>Kelowna → Bellingham runs the <b>Okanagan / Hwy 3 or 5A corridor</b>, near active Interior fire zones. Recheck DriveBC + the border wait at the crossing McNeel's near. Build slack before the show — this is the one leg you can't be late on.</span>
+    </div>
+
+    <div class="rail">
+      <div class="ev meal"><span class="t">6:50a</span><span class="node"></span>
+        <div class="h">Depart hotel → Deville Coffee (opens 7)<span class="tag meal">coffee</span></div>
+        <div class="lk"><a class="eat" href="https://www.devillecoffee.ca/" target="_blank" rel="noopener"><span class="ic">▤</span>Deville</a><a class="gmap" href="https://maps.app.goo.gl/Rsv1wKhJKBPsRfG28" target="_blank" rel="noopener"><span class="ic">◉</span>→ Bellingham</a><a class="waze" href="https://waze.com/ul?q=Bellingham%2C%20WA&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Bellingham</a></div>
+      </div>
+      <div class="leg"><span class="lt">↓ · cross US border</span></div>
+      <div class="ev meal"><span class="t">11a–1p</span><span class="node"></span>
+        <div class="h">Brunch in Bellingham w/ McNeel<span class="tag meal">brunch</span></div>
+        <div class="d">Birch Door · Sweet Bay · or McNeel's pick.</div>
+        <div class="lk"><a class="eat" href="https://birchdoorcafe.com/" target="_blank" rel="noopener"><span class="ic">▤</span>Birch Door</a><a class="eat" href="https://www.sweetbaybellingham.com/" target="_blank" rel="noopener"><span class="ic">▤</span>Sweet Bay</a></div>
+      </div>
+      <div class="leg"><span class="lt">↓ ~1.5 hr</span></div>
+      <div class="ev stop"><span class="t">2:20–3p</span><span class="node"></span>
+        <div class="h">Arrive Leiter's<span class="tag stop">regroup</span></div>
+        <div class="d">Depart by 4:30 (≈30 min to venue). Earlier if you want to tailgate.</div>
+      </div>
+      <div class="leg"><span class="lt">↓ ~30 min</span></div>
+      <div class="ev show"><span class="t">5:00p</span><span class="node"></span>
+        <div class="h">Gates — Remlinger Farms<span class="tag show">show</span></div>
+        <div class="d">Joe Russo's Almost Dead.</div>
+        <div class="lk"><a class="tix" href="https://remlingerfarms.com/joe-russos-almost-dead/" target="_blank" rel="noopener"><span class="ic">◈</span>Venue / JRAD</a></div>
+      </div>
+      <div class="ev show"><span class="t">6:00p</span><span class="node"></span>
+        <div class="h">Showtime 🎶<span class="tag show">JRAD</span></div>
+      </div>
+      <div class="ev show"><span class="t">9:30p</span><span class="node"></span>
+        <div class="h">Show ends → back to Leiter's ~10:30–11p</div>
+        <div class="d">Home. What a loop.</div>
+      </div>
+    </div>
+  </details>
+
+  <div class="checks">
+    <a href="https://www.drivebc.ca/" target="_blank" rel="noopener">DriveBC</a>
+    <a href="https://firesmoke.ca/" target="_blank" rel="noopener">FireSmoke.ca</a>
+    <a href="https://wildfiresituation.nrs.gov.bc.ca/" target="_blank" rel="noopener">BC Wildfire</a>
+    <a href="https://511.alberta.ca/" target="_blank" rel="noopener">Alberta 511</a>
+    <a href="https://weather.gc.ca/" target="_blank" rel="noopener">AQHI</a>
+  </div>
+
+  <footer>
+    Times are conservative — the plan tends to run ahead.<br>
+    Verify roads, smoke &amp; border waits the night before each leg.<br>
+    Park admission free through Sep 7 (Canada Strong Pass) · shuttle fares &amp; parking still apply.
+  </footer>
+
+</div>
+
+<script>
+  const days = Array.from(document.querySelectorAll('details.day'));
+  document.getElementById('expandAll').onclick = () => days.forEach(d => d.open = true);
+  document.getElementById('collapseAll').onclick = () => days.forEach(d => d.open = false);
+
+  (function initToday(){
+    const bar = document.getElementById('todaybar');
+    const nowText = document.getElementById('nowText');
+    const jumpBtn = document.getElementById('jumpToday');
+    let target = null;
+
+    function refresh(doScroll){
+      // Local "today" as YYYY-MM-DD (device time = wherever the traveler is)
+      const now = new Date();
+      const pad = n => String(n).padStart(2,'0');
+      const todayStr = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
+
+      const dated = days
+        .map(d => ({el:d, date:d.dataset.date}))
+        .filter(o => o.date)
+        .sort((a,b) => a.date.localeCompare(b.date));
+      if(!dated.length) return;
+
+      const first = dated[0].date, last = dated[dated.length-1].date;
+      const match = dated.find(o => o.date === todayStr);
+
+      const fmt = s => {
+        const [y,m,d] = s.split('-').map(Number);
+        return new Date(y,m-1,d).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
+      };
+
+      // clear any prior today-state so re-runs are clean
+      bar.classList.remove('pre','post');
+      days.forEach(d => d.classList.remove('is-today'));
+      document.querySelectorAll('.todaypill').forEach(p => p.remove());
+      bar.hidden = false;
+      target = null;
+
+      if(match){
+        target = match.el;
+        nowText.textContent = 'Today · ' + fmt(todayStr);
+        jumpBtn.textContent = 'Jump to today ↓';
+        days.forEach(d => { d.open = false; });
+        target.open = true;
+        target.classList.add('is-today');
+        const title = target.querySelector('.daytitle');
+        if(title && !title.querySelector('.todaypill')){
+          const pill = document.createElement('span');
+          pill.className = 'todaypill'; pill.textContent = 'Today';
+          title.appendChild(pill);
+        }
+        if(doScroll){
+          setTimeout(() => target.scrollIntoView({behavior:'smooth', block:'start'}), 350);
+        }
+      } else if(todayStr < first){
+        bar.classList.add('pre');
+        const daysOut = Math.round((new Date(first) - new Date(todayStr))/86400000);
+        nowText.textContent = 'Trip starts ' + fmt(first) + (daysOut>0 ? ' · '+daysOut+' day'+(daysOut>1?'s':'')+' out' : '');
+        target = dated[0].el;
+        jumpBtn.textContent = 'Jump to Day 1 ↓';
+      } else if(todayStr > last){
+        bar.classList.add('post');
+        nowText.textContent = 'Trip complete · what a loop';
+        target = dated[dated.length-1].el;
+        jumpBtn.textContent = 'Back to start ↑';
+      } else {
+        const next = dated.find(o => o.date > todayStr);
+        nowText.textContent = 'In Banff · next drive ' + fmt(next.date);
+        target = next.el;
+        jumpBtn.textContent = 'Jump to next leg ↓';
+      }
+    }
+
+    jumpBtn.onclick = () => {
+      if(!target) return;
+      target.open = true;
+      target.scrollIntoView({behavior:'smooth', block:'start'});
+    };
+
+    // First run (with scroll to today if it's a trip day)
+    refresh(true);
+
+    // Re-run when the app returns from background / regains focus / is restored
+    // from the back-forward cache — so save-to-home-screen stays current without
+    // a manual refresh. Only re-scrolls if the calendar day actually changed.
+    let lastDay = new Date().toDateString();
+    const maybeRefresh = () => {
+      const nowDay = new Date().toDateString();
+      const changed = nowDay !== lastDay;
+      lastDay = nowDay;
+      refresh(changed);
+    };
+    document.addEventListener('visibilitychange', () => { if(!document.hidden) maybeRefresh(); });
+    window.addEventListener('focus', maybeRefresh);
+    window.addEventListener('pageshow', maybeRefresh);
+  })();
+</script>
+</body>
+</html>
