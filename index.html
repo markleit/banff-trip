@@ -9,6 +9,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="icon" type="image/png" href="./icon-192.png">
 <meta name="theme-color" content="#1f4a3f">
 <style>
   :root{
@@ -353,6 +355,59 @@
   .opt .oh{font-weight:700;font-size:16px;margin:3px 0 1px;letter-spacing:-.005em}
   .opt .od{font-size:13.5px;color:#4a5654;margin-top:3px}
   .opt .orr{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--drive);font-weight:700;margin:10px 0 4px}
+
+  /* ---------- APPLE MAPS CHIP ---------- */
+  .lk a.amap{border-color:#b0b3b8;color:#3a3f45;background:#fff}
+  .lk a.amap:hover,.lk a.amap:active{background:#f0f1f3;border-color:#8e8e93}
+  .lk a.amap .ic{color:#111;font-size:12px}
+
+  /* ---------- OFFLINE-READY BADGE ---------- */
+  .offlinebar{display:flex;justify-content:center;margin:8px 0 0}
+  .offlinebadge{
+    font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.03em;
+    color:var(--pine);background:rgba(46,107,87,.1);border:1px solid rgba(46,107,87,.3);
+    border-radius:20px;padding:4px 12px;display:inline-flex;align-items:center;gap:6px;
+  }
+
+  /* ---------- UNIFIED DIRECTIONS BUTTON + CHOOSER ---------- */
+  .lk a.dir{border-color:var(--sky);color:var(--dusk);background:var(--paper)}
+  .lk a.dir:hover,.lk a.dir:active{border-color:var(--spruce);color:var(--pine);background:#fff}
+  .lk a.dir .ic{color:var(--spruce);font-size:12px}
+  .sheet{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center}
+  .sheet[hidden]{display:none}
+  .sheet-bg{position:absolute;inset:0;background:rgba(20,32,31,.45)}
+  .sheet-card{position:relative;width:100%;max-width:460px;margin:0 10px calc(10px + env(safe-area-inset-bottom));background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 8px 30px rgba(0,0,0,.28);animation:sheetup .18s ease}
+  @keyframes sheetup{from{transform:translateY(14px);opacity:.5}to{transform:none;opacity:1}}
+  .sheet-title{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--dusk);text-align:center;padding:6px 4px 12px}
+  .sheet-btn{display:flex;align-items:center;gap:10px;justify-content:center;text-decoration:none;font-family:var(--sans);font-size:16px;font-weight:650;padding:13px;border-radius:12px;border:1px solid var(--line);margin-bottom:8px;color:var(--ink);background:var(--paper2)}
+  .sheet-btn span{font-size:15px}
+  .sheet-btn.g{color:#1a73e8}
+  .sheet-btn.a{color:#3a3f45}
+  .sheet-btn.w{color:#0b93c4}
+  .sheet-cancel{width:100%;padding:13px;border-radius:12px;border:none;background:var(--sand);color:var(--dusk);font-family:var(--sans);font-size:16px;font-weight:650;cursor:pointer}
+
+  /* ---------- SYSTEM DARK MODE ---------- */
+  @media (prefers-color-scheme: dark){
+    :root{
+      --ink:#e9e3d6; --paper:#14181a; --paper2:#1b2124; --sand:#20262a;
+      --line:#39434a; --dusk:#b0c0d8; --sky:#8ca6c2;
+      --pine:#5eab8f; --spruce:#67b598; --hike:#52a184;
+      --amber:#e0913f; --rust:#d97a5c; --drive:#c6b485; --stop:#e0913f; --show:#c785b3;
+    }
+    body{
+      background-image:
+        repeating-linear-gradient(0deg, transparent 0 38px, rgba(255,255,255,.028) 38px 39px),
+        repeating-linear-gradient(90deg, transparent 0 38px, rgba(255,255,255,.028) 38px 39px);
+    }
+    .ev .d,.opt .od,.interlude p{color:#b4bcba}
+    .ev .h,.opt .oh,.daytitle,.hero h1{color:var(--ink)}
+    .tag.drive{color:#d0be91} .tag.stop,.tag.meal{color:#e6a765}
+    .callout.fire{color:#eaa992} .callout.book{color:#e8b684} .callout.tz{color:var(--dusk)}
+    /* keep the brand map chips light so their colors stay legible on a dark page */
+    .lk a{background:var(--paper2)}
+    .lk a.gmap{background:#f6f1e6}
+    .sheet-btn.a{color:#dfe3e7}
+  }
 </style>
 </head>
 <body>
@@ -392,6 +447,11 @@
     <button id="collapseAll">Collapse all</button>
   </div>
 
+  <div class="lk" style="justify-content:center;margin:10px 0 0">
+    <a class="gmap" href="https://www.google.com/maps/dir/?api=1&amp;origin=47.6931381,-122.1021914&amp;destination=48.7931187,-122.4853134&amp;waypoints=52.8297309,-119.2798384%7C52.8846038,-118.0807638%7C51.0871394,-115.3267252%7C49.8888114,-119.4232831&amp;travelmode=driving" target="_blank" rel="noopener"><span class="ic">◉</span>Full route overview</a>
+  </div>
+  <div class="offlinebar"><span class="offlinebadge" id="offlineBadge" hidden><span>✓</span>Saved for offline</span></div>
+
   <div class="todaybar" id="todaybar" hidden>
     <span class="now"><span class="pulse"></span><span id="nowText">—</span></span>
     <button class="jump" id="jumpToday">Jump to today ↓</button>
@@ -423,30 +483,30 @@
       <div class="ev drive"><span class="t">5:00a</span><span class="node"></span>
         <div class="h">Depart Redmond<span class="tag drive">6am HARD</span></div>
         <div class="d">Coffee only — brunch waits for Kamloops. Aim for 5, worst case 6.</div>
-        <div class="lk"><a class="gmap" href="https://www.google.com/maps/dir/?api=1&destination=50.6758066,-120.3376101" target="_blank" rel="noopener"><span class="ic">◉</span>Leg 1 → Kamloops</a><a class="waze" href="https://waze.com/ul?q=Chook%20Eatery%2C%20Kamloops%20BC&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Kamloops</a></div>
+        <div class="lk"><a class="dir" href="#" data-ll="50.6758066,-120.3376101" data-name="Leg 1 → Kamloops"><span class="ic">&#9672;</span>Leg 1 → Kamloops</a></div>
       </div>
       <div class="leg"><span class="lt">↓ ~4.5 hr · Hwy 5 · + border (buffer 30–60 min)</span></div>
       <div class="ev meal"><span class="t">10–11a</span><span class="node"></span>
         <div class="h">Chook Eatery, Kamloops<span class="tag meal">brunch</span></div>
         <div class="d">Quick cannabis stop nearby (Dazed) optional.</div>
-        <div class="lk"><a class="eat" href="https://chookeatery.ca/" target="_blank" rel="noopener"><span class="ic">▤</span>Chook menu</a><a class="eat" href="https://dazedcannabis.ca/" target="_blank" rel="noopener"><span class="ic">▤</span>Dazed</a><a class="gmap" href="https://www.google.com/maps/dir/?api=1&destination=51.7360164,-120.011065" target="_blank" rel="noopener"><span class="ic">◉</span>→ Spahats</a><a class="waze" href="https://waze.com/ul?q=Spahats%20Falls%2C%20BC&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Spahats</a></div>
+        <div class="lk"><a class="eat" href="https://chookeatery.ca/" target="_blank" rel="noopener"><span class="ic">▤</span>Chook menu</a><a class="eat" href="https://dazedcannabis.ca/" target="_blank" rel="noopener"><span class="ic">▤</span>Dazed</a><a class="dir" href="#" data-ll="51.7360164,-120.011065" data-name="→ Spahats"><span class="ic">&#9672;</span>→ Spahats</a></div>
       </div>
       <div class="leg"><span class="lt">↓ ~2 hr</span></div>
       <div class="ev stop"><span class="t">2:30p</span><span class="node"></span>
         <div class="h">Spahats Falls<span class="tag stop">falls</span></div>
         <div class="d">Quick ½-mi loop to the viewpoint.</div>
-        <div class="lk"><a class="trail" href="https://www.alltrails.com/explore/trail/canada/british-columbia/spahat-falls" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="gmap" href="https://www.google.com/maps/dir/?api=1&destination=51.6844466,-120.0224671" target="_blank" rel="noopener"><span class="ic">◉</span>→ Triple Decker</a><a class="waze" href="https://waze.com/ul?q=Candle%20Creek%20Falls%2C%20BC&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Triple Decker</a></div>
+        <div class="lk"><a class="trail" href="https://www.alltrails.com/explore/trail/canada/british-columbia/spahat-falls" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="dir" href="#" data-ll="51.6844466,-120.0224671" data-name="→ Triple Decker"><span class="ic">&#9672;</span>→ Triple Decker</a></div>
       </div>
       <div class="leg"><span class="lt">↓ 5 min</span></div>
       <div class="ev hike"><span class="t">3:05p</span><span class="node"></span>
         <div class="h">Triple Decker / Candle Creek Falls<span class="tag hike">hike</span></div>
         <div class="d">~3 mi, allot ~90 min.</div>
-        <div class="lk"><a class="trail" href="https://www.alltrails.com/trail/canada/british-columbia/candle-creek-falls" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="gmap" href="https://www.google.com/maps/dir/?api=1&destination=52.8297309,-119.2798384" target="_blank" rel="noopener"><span class="ic">◉</span>→ Valemount</a><a class="waze" href="https://waze.com/ul?q=Comfort%20Inn%20Valemount&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Valemount</a></div>
+        <div class="lk"><a class="trail" href="https://www.alltrails.com/trail/canada/british-columbia/candle-creek-falls" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="dir" href="#" data-ll="52.8297309,-119.2798384" data-name="→ Valemount"><span class="ic">&#9672;</span>→ Valemount</a></div>
       </div>
       <div class="leg"><span class="lt">↓ ~2 hr</span></div>
       <div class="ev stop"><span class="t">6:45p</span><span class="node"></span>
         <div class="h">Check in — Comfort Inn, Valemount<span class="tag stop">hotel</span></div>
-        <div class="lk"><a class="gmap" href="https://www.google.com/maps/dir/?api=1&destination=52.975361,-119.3644525" target="_blank" rel="noopener"><span class="ic">◉</span>→ Rearguard Falls</a><a class="waze" href="https://waze.com/ul?q=Rearguard%20Falls%2C%20BC&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Rearguard</a></div>
+        <div class="lk"><a class="dir" href="#" data-ll="52.975361,-119.3644525" data-name="→ Rearguard Falls"><span class="ic">&#9672;</span>→ Rearguard Falls</a></div>
       </div>
       <div class="ev stop"><span class="t">7:15p</span><span class="node"></span>
         <div class="h">Rearguard Falls<span class="tag stop">falls</span></div>
@@ -456,7 +516,7 @@
       <div class="ev meal"><span class="t">8:00p</span><span class="node"></span>
         <div class="h">Dinner in Valemount<span class="tag meal">eat</span></div>
         <div class="d">Most close by 9.</div>
-        <div class="lk"><a class="eat" href="https://www.caribougrill.com/" target="_blank" rel="noopener"><span class="ic">▤</span>Caribou Grill</a><a class="eat" href="https://www.google.com/maps/dir/?api=1&destination=52.832351,-119.2634408" target="_blank" rel="noopener"><span class="ic">▤</span>Funky Goat</a><a class="eat" href="https://glacierfirepizzeria.ca/menu" target="_blank" rel="noopener"><span class="ic">▤</span>Glacier Fire ·8:30</a><a class="eat" href="https://www.themoosepubvalemount.com/food" target="_blank" rel="noopener"><span class="ic">▤</span>Moose Pub</a><a class="eat" href="https://www.google.com/maps/dir/?api=1&destination=52.8322939,-119.263016" target="_blank" rel="noopener"><span class="ic">▤</span>BoShays</a></div>
+        <div class="lk"><a class="eat" href="https://www.caribougrill.com/" target="_blank" rel="noopener"><span class="ic">▤</span>Caribou Grill</a><a class="eat" href="https://www.google.com/maps/dir/?api=1&amp;destination=52.832351,-119.2634408" target="_blank" rel="noopener"><span class="ic">▤</span>Funky Goat</a><a class="eat" href="https://glacierfirepizzeria.ca/menu" target="_blank" rel="noopener"><span class="ic">▤</span>Glacier Fire ·8:30</a><a class="eat" href="https://www.themoosepubvalemount.com/food" target="_blank" rel="noopener"><span class="ic">▤</span>Moose Pub</a><a class="eat" href="https://www.google.com/maps/dir/?api=1&amp;destination=52.8322939,-119.263016" target="_blank" rel="noopener"><span class="ic">▤</span>BoShays</a></div>
       </div>
       <div class="ev"><span class="t">9:15p</span><span class="node" style="border-color:var(--dusk);background:var(--dusk)"></span>
         <div class="h">Crash 💤</div>
@@ -484,14 +544,14 @@
       <div class="ev drive"><span class="t">5:00a</span><span class="node"></span>
         <div class="h">Depart Valemount<span class="tag drive">6am MT hard</span></div>
         <div class="d">Beat the Saturday parking crunch — lot fills before 10a.</div>
-        <div class="lk"><a class="gmap" href="https://www.google.com/maps/dir/?api=1&destination=52.7265953,-117.645045" target="_blank" rel="noopener"><span class="ic">◉</span>→ Bald Hills TH</a><a class="waze" href="https://waze.com/ul?q=Bald%20Hills%20Trailhead%2C%20Jasper&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Bald Hills TH</a></div>
+        <div class="lk"><a class="dir" href="#" data-ll="52.7265953,-117.645045" data-name="→ Bald Hills TH"><span class="ic">&#9672;</span>→ Bald Hills TH</a></div>
       </div>
       <div class="leg"><span class="lt">↓ ~2.5 hr incl. time-zone loss</span></div>
       <div class="ev hike"><span class="t">8–8:30a</span><span class="node"></span>
         <div class="h">Bald Hills Loop<span class="tag hike">big hike</span></div>
         <div class="d">The full loop with the summit ridge — this is a real 6-hour day, not a quick stop.</div>
         <div class="mi">plan 8:30a–2:30p on trail</div>
-        <div class="lk"><a class="trail" href="https://www.alltrails.com/trail/canada/alberta/bald-hills-trail-loop" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="gmap" href="https://www.google.com/maps/dir/?api=1&destination=52.8846038,-118.0807638" target="_blank" rel="noopener"><span class="ic">◉</span>→ Jasper</a><a class="waze" href="https://waze.com/ul?q=Jasper%2C%20AB&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Jasper</a></div>
+        <div class="lk"><a class="trail" href="https://www.alltrails.com/trail/canada/alberta/bald-hills-trail-loop" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="dir" href="#" data-ll="52.8846038,-118.0807638" data-name="→ Jasper"><span class="ic">&#9672;</span>→ Jasper</a></div>
       </div>
       <div class="leg"><span class="lt">↓ to Jasper</span></div>
       <div class="ev stop"><span class="t">3:30p</span><span class="node"></span>
@@ -529,18 +589,18 @@
     <div class="rail">
       <div class="ev drive"><span class="t">6:00a</span><span class="node"></span>
         <div class="h">Depart Jasper<span class="tag drive">dawn</span></div>
-        <div class="lk"><a class="gmap" href="https://www.google.com/maps/dir/?api=1&destination=52.8082661,-118.0234092" target="_blank" rel="noopener"><span class="ic">◉</span>→ Five Lakes</a><a class="waze" href="https://waze.com/ul?q=Valley%20of%20the%20Five%20Lakes%20Trailhead%2C%20Jasper&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Five Lakes</a></div>
+        <div class="lk"><a class="dir" href="#" data-ll="52.8082661,-118.0234092" data-name="→ Five Lakes"><span class="ic">&#9672;</span>→ Five Lakes</a></div>
       </div>
       <div class="leg"><span class="lt">↓ 15 min</span></div>
       <div class="ev hike"><span class="t">6:15a</span><span class="node"></span>
         <div class="h">Valley of the Five Lakes<span class="tag hike">hike</span></div>
         <div class="d">First real stop. <b>The cut candidate</b> if legs are shot after two dawn starts.</div>
-        <div class="lk"><a class="trail" href="https://www.alltrails.com/trail/canada/alberta/valley-of-the-five-lakes-and-first-lake" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="gmap" href="https://www.google.com/maps/dir/?api=1&destination=52.664437,-117.8837673" target="_blank" rel="noopener"><span class="ic">◉</span>→ Athabasca</a><a class="waze" href="https://waze.com/ul?q=Athabasca%20Falls%2C%20AB&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Athabasca</a></div>
+        <div class="lk"><a class="trail" href="https://www.alltrails.com/trail/canada/alberta/valley-of-the-five-lakes-and-first-lake" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="dir" href="#" data-ll="52.664437,-117.8837673" data-name="→ Athabasca"><span class="ic">&#9672;</span>→ Athabasca</a></div>
       </div>
       <div class="leg"><span class="lt">↓ · stop at Athabasca Pass Lookout</span></div>
       <div class="ev stop"><span class="t">9:00a</span><span class="node"></span>
         <div class="h">Athabasca Falls<span class="tag stop">falls</span></div>
-        <div class="lk"><a class="trail" href="https://www.alltrails.com/trail/canada/alberta/athabasca-falls" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="gmap" href="https://www.google.com/maps/dir/?api=1&destination=52.5322769,-117.6450627" target="_blank" rel="noopener"><span class="ic">◉</span>→ Sunwapta</a><a class="waze" href="https://waze.com/ul?q=Sunwapta%20Falls%2C%20AB&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Sunwapta</a></div>
+        <div class="lk"><a class="trail" href="https://www.alltrails.com/trail/canada/alberta/athabasca-falls" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="dir" href="#" data-ll="52.5322769,-117.6450627" data-name="→ Sunwapta"><span class="ic">&#9672;</span>→ Sunwapta</a></div>
       </div>
       <div class="leg"><span class="lt">↓ · stop at Goats &amp; Glacier Lookout</span></div>
       <div class="ev stop"><span class="t">9:50a</span><span class="node"></span>
@@ -561,7 +621,7 @@
       <div class="ev stop"><span class="t">5:00p</span><span class="node"></span>
         <div class="h">Arrive Canmore — house<span class="tag stop">basecamp</span></div>
         <div class="d">Hoodoos hikeable from the door if anyone's got legs left. Likely cooked — no shame in calling it.</div>
-        <div class="lk"><a class="gmap" href="https://www.google.com/maps/dir/?api=1&destination=51.0871394,-115.3267252" target="_blank" rel="noopener"><span class="ic">◉</span>Canmore trails</a><a class="waze" href="https://waze.com/ul?q=Canmore%2C%20AB&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Canmore</a><a class="trail" href="https://www.alltrails.com/explore/poi/canada/alberta/canmore/canmore-hoodoos" target="_blank" rel="noopener"><span class="ic">△</span>Hoodoos</a></div>
+        <div class="lk"><a class="dir" href="#" data-ll="51.0871394,-115.3267252" data-name="Canmore trails"><span class="ic">&#9672;</span>Canmore trails</a><a class="trail" href="https://www.alltrails.com/explore/poi/canada/alberta/canmore/canmore-hoodoos" target="_blank" rel="noopener"><span class="ic">△</span>Hoodoos</a></div>
       </div>
     </div>
   </details>
@@ -590,8 +650,8 @@
         <div class="oh">Plain of Six Glaciers · Big Beehive · Lake Agnes Tea House</div>
         <div class="od">The marquee loop, counter-clockwise. Optional add-on: Devil's Thumb.</div>
         <div class="lk">
-          <a class="trail" href="https://www.alltrails.com/explore/custom-routes/ccw-plain-of-six-glaciers-big-beehive-lac-agnes-tea-house-8b78436?u=i&sh=dctrze" target="_blank" rel="noopener"><span class="ic">△</span>Full loop (CCW)</a>
-          <a class="trail" href="https://www.alltrails.com/explore/custom-routes/devils-thumb-add-on-04b8eec?u=i&sh=dctrze" target="_blank" rel="noopener"><span class="ic">△</span>+ Devil's Thumb add-on</a>
+          <a class="trail" href="https://www.alltrails.com/explore/custom-routes/ccw-plain-of-six-glaciers-big-beehive-lac-agnes-tea-house-8b78436?u=i&amp;sh=dctrze" target="_blank" rel="noopener"><span class="ic">△</span>Full loop (CCW)</a>
+          <a class="trail" href="https://www.alltrails.com/explore/custom-routes/devils-thumb-add-on-04b8eec?u=i&amp;sh=dctrze" target="_blank" rel="noopener"><span class="ic">△</span>+ Devil's Thumb add-on</a>
         </div>
       </div>
 
@@ -615,6 +675,7 @@
         <div class="orr">— OR —</div>
         <div class="oh">Lake O'Hara + Lake Oesa via Alpine loop</div>
         <div class="od">If we do the Iceline loop with the group, maybe save this for the return trip — or it may be the better pick for Jimbo.</div>
+        <div class="od" style="color:var(--rust);font-weight:600">⚠ Access is reservation-controlled — the Parks Canada bus into Lake O'Hara needs an advance day-use booking (very limited, books out fast). Lock in a seat before counting on this one.</div>
         <div class="lk">
           <a class="trail" href="https://www.alltrails.com/trail/canada/british-columbia/lake-ohara-and-lake-oesa-via-alpine-loop-trail" target="_blank" rel="noopener"><span class="ic">△</span>Lake O'Hara / Oesa</a>
         </div>
@@ -656,36 +717,36 @@
     <div class="rail">
       <div class="ev drive"><span class="t">6:00a</span><span class="node"></span>
         <div class="h">Depart — A Bear &amp; Bison Inn<span class="tag drive">dawn</span></div>
-        <div class="lk"><a class="gmap" href="https://www.google.com/maps/dir/?api=1&destination=51.4434375,-116.5307692" target="_blank" rel="noopener"><span class="ic">◉</span>→ Emerald Lake</a><a class="waze" href="https://waze.com/ul?q=Emerald%20Lake%2C%20Yoho&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Emerald Lake</a></div>
+        <div class="lk"><a class="dir" href="#" data-ll="51.4434375,-116.5307692" data-name="→ Emerald Lake"><span class="ic">&#9672;</span>→ Emerald Lake</a></div>
       </div>
       <div class="leg"><span class="lt">↓ ~1:20 · gain 1 hr crossing into BC</span></div>
       <div class="ev hike"><span class="t">6:20a</span><span class="node"></span>
         <div class="h">Emerald Lake Loop, Yoho<span class="tag hike">hike</span></div>
         <div class="d">Optional full loop ~2 hr. Glassy morning water before crowds.</div>
-        <div class="lk"><a class="trail" href="https://www.alltrails.com/trail/canada/british-columbia/emerald-lake-loop" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="gmap" href="https://www.google.com/maps/dir/?api=1&destination=51.3822455,-116.5304167" target="_blank" rel="noopener"><span class="ic">◉</span>→ Natural Bridge</a><a class="waze" href="https://waze.com/ul?q=Natural%20Bridge%2C%20Yoho%20BC&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Natural Bridge</a></div>
+        <div class="lk"><a class="trail" href="https://www.alltrails.com/trail/canada/british-columbia/emerald-lake-loop" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="dir" href="#" data-ll="51.3822455,-116.5304167" data-name="→ Natural Bridge"><span class="ic">&#9672;</span>→ Natural Bridge</a></div>
       </div>
       <div class="leg"><span class="lt">↓ short</span></div>
       <div class="ev stop"><span class="t">8:20a</span><span class="node"></span>
         <div class="h">Natural Bridge<span class="tag stop">roadside</span></div>
-        <div class="lk"><a class="trail" href="https://www.alltrails.com/trail/canada/british-columbia/road-side-stop-at-natural-bridge" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="gmap" href="https://www.google.com/maps/dir/?api=1&destination=51.2662643,-117.4950959" target="_blank" rel="noopener"><span class="ic">◉</span>→ Glacier NP</a><a class="waze" href="https://waze.com/ul?q=Rogers%20Pass%20Discovery%20Centre%2C%20BC&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Glacier NP</a></div>
+        <div class="lk"><a class="trail" href="https://www.alltrails.com/trail/canada/british-columbia/road-side-stop-at-natural-bridge" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="dir" href="#" data-ll="51.2662643,-117.4950959" data-name="→ Glacier NP"><span class="ic">&#9672;</span>→ Glacier NP</a></div>
       </div>
       <div class="leg"><span class="lt">↓ · quick stop at Rogers Pass Centre</span></div>
       <div class="ev hike"><span class="t">10:45a</span><span class="node"></span>
         <div class="h">Marion Lake + Meeting of the Waters<span class="tag hike">hike</span></div>
         <div class="d">Glacier NP (BC). Wrap ~12:45p.</div>
-        <div class="lk"><a class="trail" href="https://www.alltrails.com/explore/custom-routes/marion-lake-with-meeting-of-the-waters-d45030b" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="gmap" href="https://www.google.com/maps/dir/?api=1&destination=51.0410967,-118.1487177" target="_blank" rel="noopener"><span class="ic">◉</span>→ Mt Revelstoke</a><a class="waze" href="https://waze.com/ul?q=Mount%20Revelstoke%20National%20Park&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Mt Revelstoke</a></div>
+        <div class="lk"><a class="trail" href="https://www.alltrails.com/explore/custom-routes/marion-lake-with-meeting-of-the-waters-d45030b" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="dir" href="#" data-ll="51.0410967,-118.1487177" data-name="→ Mt Revelstoke"><span class="ic">&#9672;</span>→ Mt Revelstoke</a></div>
       </div>
       <div class="leg"><span class="lt">↓ to Mt Revelstoke NP</span></div>
       <div class="ev hike"><span class="t">2:15p</span><span class="node"></span>
         <div class="h">Mt Revelstoke — Upper Summit Trail<span class="tag hike">short hike</span></div>
         <div class="d">Drive the Meadows-in-the-Sky parkway up. Food in Revelstoke before or after. Depart trail ~3:30p.</div>
-        <div class="lk"><a class="trail" href="https://www.alltrails.com/trail/canada/british-columbia/upper-summit-trail" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="gmap" href="https://www.google.com/maps/dir/?api=1&destination=49.8888114,-119.4232831" target="_blank" rel="noopener"><span class="ic">◉</span>→ Kelowna</a><a class="waze" href="https://waze.com/ul?q=Kelowna%2C%20BC&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Kelowna</a></div>
+        <div class="lk"><a class="trail" href="https://www.alltrails.com/trail/canada/british-columbia/upper-summit-trail" target="_blank" rel="noopener"><span class="ic">△</span>AllTrails</a><a class="dir" href="#" data-ll="49.8888114,-119.4232831" data-name="→ Kelowna"><span class="ic">&#9672;</span>→ Kelowna</a></div>
       </div>
       <div class="leg"><span class="lt">↓ depart Revelstoke by 4:00p · ~3 hr</span></div>
       <div class="ev stop"><span class="t">7:00p</span><span class="node"></span>
         <div class="h">Kelowna — Fairfield Inn &amp; Suites<span class="tag stop">hotel</span></div>
         <div class="d">Late food options available. Feet up.</div>
-        <div class="lk"><a class="gmap" href="https://www.google.com/maps/dir/?api=1&destination=49.8888114,-119.4232831" target="_blank" rel="noopener"><span class="ic">◉</span>Fairfield Inn</a><a class="waze" href="https://waze.com/ul?q=Fairfield%20Inn%20%26%20Suites%20Kelowna&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Fairfield Inn</a></div>
+        <div class="lk"><a class="dir" href="#" data-ll="49.8888114,-119.4232831" data-name="Fairfield Inn"><span class="ic">&#9672;</span>Fairfield Inn</a></div>
       </div>
     </div>
   </details>
@@ -708,7 +769,7 @@
     <div class="rail">
       <div class="ev meal"><span class="t">6:50a</span><span class="node"></span>
         <div class="h">Depart hotel → Deville Coffee (opens 7)<span class="tag meal">coffee</span></div>
-        <div class="lk"><a class="eat" href="https://www.devillecoffee.ca/" target="_blank" rel="noopener"><span class="ic">▤</span>Deville</a><a class="gmap" href="https://www.google.com/maps/dir/?api=1&destination=48.7931187,-122.4853134" target="_blank" rel="noopener"><span class="ic">◉</span>→ Bellingham</a><a class="waze" href="https://waze.com/ul?q=Bellingham%2C%20WA&navigate=yes" target="_blank" rel="noopener"><span class="ic">➤</span>Bellingham</a></div>
+        <div class="lk"><a class="eat" href="https://www.devillecoffee.ca/" target="_blank" rel="noopener"><span class="ic">▤</span>Deville</a><a class="dir" href="#" data-ll="48.7931187,-122.4853134" data-name="→ Bellingham"><span class="ic">&#9672;</span>→ Bellingham</a></div>
       </div>
       <div class="leg"><span class="lt">↓ · cross US border</span></div>
       <div class="ev meal"><span class="t">11a–1p</span><span class="node"></span>
@@ -752,6 +813,43 @@
   </footer>
 
 </div>
+
+<!-- Directions chooser: one button per stop opens this Google / Apple / Waze picker -->
+<div class="sheet" id="dirSheet" hidden>
+  <div class="sheet-bg" data-close></div>
+  <div class="sheet-card">
+    <div class="sheet-title" id="dirTitle">Open directions in</div>
+    <a class="sheet-btn g" id="dirGoogle" target="_blank" rel="noopener"><span>◉</span>Google Maps</a>
+    <a class="sheet-btn a" id="dirApple" target="_blank" rel="noopener"><span>&#63743;</span>Apple Maps</a>
+    <a class="sheet-btn w" id="dirWaze" target="_blank" rel="noopener"><span>➤</span>Waze</a>
+    <button class="sheet-cancel" data-close>Cancel</button>
+  </div>
+</div>
+
+<script>
+  // Directions chooser — each ".dir" button carries its destination in data-ll;
+  // tapping opens the same coordinates in Google Maps, Apple Maps, or Waze.
+  (function(){
+    var sheet=document.getElementById('dirSheet'), title=document.getElementById('dirTitle');
+    var g=document.getElementById('dirGoogle'), a=document.getElementById('dirApple'), w=document.getElementById('dirWaze');
+    function openSheet(ll,name){
+      var to=(name||'').replace(/^→\s*/,'').replace(/^Leg \d+ →\s*/,'');
+      title.textContent = to ? ('Directions — '+to) : 'Open directions in';
+      g.href='https://www.google.com/maps/dir/?api=1&destination='+ll;
+      a.href='https://maps.apple.com/?daddr='+ll+'&dirflg=d';
+      w.href='https://waze.com/ul?ll='+ll+'&navigate=yes';
+      sheet.hidden=false;
+    }
+    function closeSheet(){ sheet.hidden=true; }
+    document.addEventListener('click',function(e){
+      var d=e.target.closest('.dir');
+      if(d){ e.preventDefault(); openSheet(d.dataset.ll,d.dataset.name||''); return; }
+      if(e.target.closest('[data-close]')){ closeSheet(); }
+    });
+    [g,a,w].forEach(function(el){ el.addEventListener('click',function(){ setTimeout(closeSheet,60); }); });
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeSheet(); });
+  })();
+</script>
 
 <script>
   const days = Array.from(document.querySelectorAll('details.day'));
@@ -856,6 +954,12 @@
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+    // Reveal the "Saved for offline" badge once a service worker is active and
+    // the page is cached, so you know it's safe to head into a dead zone.
+    navigator.serviceWorker.ready.then(() => {
+      var b = document.getElementById('offlineBadge');
+      if (b) b.hidden = false;
     });
   }
 </script>
