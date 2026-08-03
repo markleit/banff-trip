@@ -1061,8 +1061,11 @@
 
 <script>
   const days = Array.from(document.querySelectorAll('details.day'));
-  document.getElementById('expandAll').onclick = () => days.forEach(d => d.open = true);
-  document.getElementById('collapseAll').onclick = () => days.forEach(d => d.open = false);
+  // Expand/Collapse all covers the day cards AND the option cards (Basecamp, Hike
+  // Options, Dinner, Jasper Eats). The today-logic below still uses `days` only.
+  const allCards = Array.from(document.querySelectorAll('details.day, details.optcard'));
+  document.getElementById('expandAll').onclick = () => allCards.forEach(d => d.open = true);
+  document.getElementById('collapseAll').onclick = () => allCards.forEach(d => d.open = false);
 
   (function initToday(){
     const bar = document.getElementById('todaybar');
