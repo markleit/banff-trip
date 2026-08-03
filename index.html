@@ -390,6 +390,11 @@
   .sheet-btn.w{color:#0b93c4}
   .sheet-cancel{width:100%;padding:13px;border-radius:12px;border:none;background:var(--sand);color:var(--dusk);font-family:var(--sans);font-size:16px;font-weight:650;cursor:pointer}
 
+  /* ---------- CLICKABLE PHASE HEADERS (collapse a whole section) ---------- */
+  .phase{cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .phase .caret{font-family:var(--mono);color:var(--sky);font-size:12px;margin-left:2px;transition:transform .2s;display:inline-block}
+  .phase.collapsed .caret{transform:rotate(-90deg)}
+
   /* ---------- SYSTEM DARK MODE ---------- */
   @media (prefers-color-scheme: dark){
     :root{
@@ -463,6 +468,7 @@
   <!-- ================= OUTBOUND ================= -->
   <div class="phase out">
     <span class="pl">Outbound (Advance)</span>
+    <span class="caret">▾</span>
     <span class="line"></span>
     <span class="meta">Fri–Sun · 3 days</span>
   </div>
@@ -902,6 +908,7 @@
   <!-- ================= RETURN ================= -->
   <div class="phase ret">
     <span class="pl">Return (Advance)</span>
+    <span class="caret">▾</span>
     <span class="line"></span>
     <span class="meta">Fri–Sat · 2 days</span>
   </div>
@@ -1063,8 +1070,30 @@
   // Expand/Collapse all covers the day cards AND the option cards (Basecamp, Hike
   // Options, Dinner, Jasper Eats). The today-logic below still uses `days` only.
   const allCards = Array.from(document.querySelectorAll('details.day, details.optcard'));
-  document.getElementById('expandAll').onclick = () => allCards.forEach(d => d.open = true);
-  document.getElementById('collapseAll').onclick = () => allCards.forEach(d => d.open = false);
+
+  // Clickable phase headers: tapping "Outbound (Advance)" / "Return (Advance)" collapses
+  // (or re-expands) that section's day cards. Each phase owns the day cards that follow it
+  // up to the next phase header. The caret flips to show the collapsed state.
+  const phases = Array.from(document.querySelectorAll('.phase.out, .phase.ret')).map(ph => {
+    const cards = [];
+    let el = ph.nextElementSibling;
+    while (el && !el.classList.contains('phase')) {
+      if (el.matches && el.matches('details.day')) cards.push(el);
+      el = el.nextElementSibling;
+    }
+    return { ph, cards };
+  });
+  const syncPhases = () => phases.forEach(p => p.ph.classList.toggle('collapsed', !p.cards.some(c => c.open)));
+  phases.forEach(p => p.ph.addEventListener('click', () => {
+    const anyOpen = p.cards.some(c => c.open);
+    p.cards.forEach(c => c.open = !anyOpen);
+    syncPhases();
+  }));
+  window.__syncPhases = syncPhases;   // let the today-logic refresh the carets too
+  syncPhases();
+
+  document.getElementById('expandAll').onclick = () => { allCards.forEach(d => d.open = true); syncPhases(); };
+  document.getElementById('collapseAll').onclick = () => { allCards.forEach(d => d.open = false); syncPhases(); };
 
   (function initToday(){
     const bar = document.getElementById('todaybar');
@@ -1132,6 +1161,7 @@
         target = next.el;
         jumpBtn.textContent = 'Jump to next leg ↓';
       }
+      if(window.__syncPhases) window.__syncPhases();
     }
 
     jumpBtn.onclick = () => {
