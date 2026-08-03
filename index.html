@@ -339,6 +339,20 @@
     .sunwx{font-size:11px}
   }
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+  /* ---------- BANFF OPTIONS CARD ---------- */
+  .optcard{background:var(--paper);border:1px solid var(--line);border-radius:10px;margin:16px 0;overflow:hidden;box-shadow:0 1px 0 rgba(20,32,31,.04)}
+  .optcard > summary{list-style:none;cursor:pointer;padding:16px 18px;display:flex;align-items:baseline;gap:14px;background:linear-gradient(180deg,var(--paper) 0%,var(--paper2) 100%);border-bottom:1px solid transparent;transition:border-color .2s}
+  .optcard[open] > summary{border-bottom-color:var(--line)}
+  .optcard > summary::-webkit-details-marker{display:none}
+  .optcard[open] .chev{transform:rotate(90deg)}
+  .optwrap{padding:6px 18px 16px}
+  .opt{border-top:1px solid var(--line);padding:14px 0}
+  .opt:first-child{border-top:none}
+  .opt .oi{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--spruce);font-weight:700}
+  .opt .oh{font-weight:700;font-size:16px;margin:3px 0 1px;letter-spacing:-.005em}
+  .opt .od{font-size:13.5px;color:#4a5654;margin-top:3px}
+  .opt .orr{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--drive);font-weight:700;margin:10px 0 4px}
 </style>
 </head>
 <body>
@@ -560,6 +574,62 @@
     <div class="days4">Aug 10 arrival buffer · Aug 11–14 hikes · Aug 14 pm → return staging</div>
     <div class="lk" style="justify-content:center;margin-top:12px"><a class="tix" href="https://reservation.pc.gc.ca/" target="_blank" rel="noopener"><span class="ic">◈</span>Parks Canada shuttle booking</a></div>
   </div>
+
+  <!-- ================= BANFF HIKE OPTIONS ================= -->
+  <details class="optcard">
+    <summary>
+      <span class="daynum">◆ MENU</span>
+      <span class="daytitle">Banff — Hike Options</span>
+      <span class="daydate">Aug 11–14</span>
+      <span class="chev">▶</span>
+    </summary>
+    <div class="optwrap">
+
+      <div class="opt">
+        <div class="oi">① Big day from Lake Louise</div>
+        <div class="oh">Plain of Six Glaciers · Big Beehive · Lake Agnes Tea House</div>
+        <div class="od">The marquee loop, counter-clockwise. Optional add-on: Devil's Thumb.</div>
+        <div class="lk">
+          <a class="trail" href="https://www.alltrails.com/explore/custom-routes/ccw-plain-of-six-glaciers-big-beehive-lac-agnes-tea-house-8b78436?u=i&sh=dctrze" target="_blank" rel="noopener"><span class="ic">△</span>Full loop (CCW)</a>
+          <a class="trail" href="https://www.alltrails.com/explore/custom-routes/devils-thumb-add-on-04b8eec?u=i&sh=dctrze" target="_blank" rel="noopener"><span class="ic">△</span>+ Devil's Thumb add-on</a>
+        </div>
+      </div>
+
+      <div class="opt">
+        <div class="oi">② Moraine — Sentinel Pass</div>
+        <div class="oh">Sentinel Pass via Larch Valley</div>
+        <div class="od">Shorter version: turn around at Larch Valley (possible Jimbo stopping point).</div>
+        <div class="lk">
+          <a class="trail" href="https://www.alltrails.com/explore/trail/canada/alberta/sentinel-pass-trail-2" target="_blank" rel="noopener"><span class="ic">△</span>Sentinel Pass</a>
+          <a class="trail" href="https://www.alltrails.com/trail/canada/alberta/larch-valley--3" target="_blank" rel="noopener"><span class="ic">△</span>Larch Valley (shorter)</a>
+        </div>
+      </div>
+
+      <div class="opt">
+        <div class="oi">③ Yoho</div>
+        <div class="oh">Iceline / Little Yoho Valley + Yoho Valley loop</div>
+        <div class="od">The big Yoho day with the group.</div>
+        <div class="lk">
+          <a class="trail" href="https://www.alltrails.com/trail/canada/british-columbia/iceline-little-yoho-valley-and-yoho-valley-trail-loop" target="_blank" rel="noopener"><span class="ic">△</span>Iceline loop</a>
+        </div>
+        <div class="orr">— OR —</div>
+        <div class="oh">Lake O'Hara + Lake Oesa via Alpine loop</div>
+        <div class="od">If we do the Iceline loop with the group, maybe save this for the return trip — or it may be the better pick for Jimbo.</div>
+        <div class="lk">
+          <a class="trail" href="https://www.alltrails.com/trail/canada/british-columbia/lake-ohara-and-lake-oesa-via-alpine-loop-trail" target="_blank" rel="noopener"><span class="ic">△</span>Lake O'Hara / Oesa</a>
+        </div>
+      </div>
+
+      <div class="opt">
+        <div class="oi">④ Also on the list</div>
+        <div class="oh">The Onion</div>
+        <div class="lk">
+          <a class="trail" href="https://www.alltrails.com/trail/canada/british-columbia/the-onion" target="_blank" rel="noopener"><span class="ic">△</span>The Onion</a>
+        </div>
+      </div>
+
+    </div>
+  </details>
 
   <!-- ================= RETURN ================= -->
   <div class="phase ret">
